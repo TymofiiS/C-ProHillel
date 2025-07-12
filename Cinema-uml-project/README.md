@@ -30,7 +30,7 @@ The online cinema system allows users to browse a movie catalog, purchase or ren
 - Classes and relationships match the logic of a real-world online cinema system
 - Chosen scenarios reflect the most common business processes (purchase, content management)
 - The rental object states are modeled according to a typical transaction lifecycle
-- ![Specifications](docs/specifications.md)
+- [Specifications](docs/specifications.md)
 
 ## Tools
 - **UML diagrams** were generated using an AI-based diagram tool in PlantUML style
