@@ -3,7 +3,7 @@
 #include "project.h"
 
 namespace core {
-// Very simple text-file storage: one task per line: "<id>|<done>|<title>"
+// JSON file storage using nlohmann_json.
 class FileStorage {
 public:
     void save(const Project& project, const std::string& file_path) const;

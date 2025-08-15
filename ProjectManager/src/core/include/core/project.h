@@ -16,6 +16,9 @@ public:
     std::optional<Task> get_task(int id) const;
     const std::vector<Task>& tasks() const noexcept;
 
+    // For persistence layers to reconstruct from storage (use with care).
+    void add_task_raw(int id, std::string title, bool done);
+
 private:
     std::string m_name;
     std::vector<Task> m_tasks;

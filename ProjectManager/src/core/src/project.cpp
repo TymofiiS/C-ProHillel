@@ -1,5 +1,6 @@
 #include "core/project.h"
 #include <algorithm>
+#include <utility>
 
 namespace core {
 
@@ -14,6 +15,15 @@ int Project::add_task(std::string title) {
     t.title = std::move(title);
     m_tasks.push_back(t);
     return t.id;
+}
+
+void Project::add_task_raw(int id, std::string title, bool done) {
+    Task t;
+    t.id = id;
+    t.title = std::move(title);
+    t.done = done;
+    m_tasks.push_back(std::move(t));
+    if (id >= m_next_id) m_next_id = id + 1;
 }
 
 bool Project::complete_task(int id) {
