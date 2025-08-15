@@ -287,15 +287,6 @@ This produces exported, namespaced targets like `ProjectManager::core` for downs
 
 ---
 
-## Submitting Your Work
-
-- Commit the code to a Git repository.
-- Ensure this **README** covers: overview, dependencies, build/run, tests, and optional packaging.
-- Provide instructions to reproduce builds with Conan + CMake.
-- Include sample CLI sessions (see *Usage* above).
-
----
-
 ## License
 
-MIT (or choose your preferred license).
+MIT.
