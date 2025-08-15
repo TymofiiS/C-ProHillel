@@ -116,7 +116,7 @@ cmake --build build --config Release
 Run:
 ```bash
 # Windows
-.uild\Release\project_manager.exe
+.build\Release\project_manager.exe
 
 # Linux/macOS
 ./build/project_manager
