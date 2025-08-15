@@ -1,0 +1,15 @@
+[requires]
+fmt/11.0.2
+spdlog/1.14.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[tool_requires]
+cmake/3.29.3
+
+[options]
+spdlog:header_only=False
+spdlog:fmt_external=True
+fmt:header_only=False
