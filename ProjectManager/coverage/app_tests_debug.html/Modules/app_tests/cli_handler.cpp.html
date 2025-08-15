@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>cli_handler.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#include "app/cli_handler.h"
+#include "core/project.h"
+#include "core/storage.h"
+
+#include &lt;spdlog/spdlog.h&gt;
+#include &lt;CLI/CLI.hpp&gt;
+#include &lt;nlohmann/json.hpp&gt;
+#include &lt;filesystem&gt;
+#include &lt;fstream&gt;
+#include &lt;system_error&gt;
+
+namespace {
+constexpr const char* DEFAULT_FILE = "projects.json";
+}
+
+namespace app {
+
+<span style = "background-color:#dfd">int CLIHandler::run(int argc, char** argv) {
+    CLI::App app{"ProjectManager CLI"};
+    app.require_subcommand(1);</span>
+
+<span style = "background-color:#dfd">    std::string file = DEFAULT_FILE;</span>
+
+    // helper: add --file to each subcommand so users can place it after the subcommand
+    auto add_file_opt = [&amp;](CLI::App* sub) {
+<span style = "background-color:#dfd">        sub-&gt;add_option("-f,--file", file, "Storage JSON file (default: projects.json)");
+    };</span>
+
+<span style = "background-color:#dfd">    int rc = 0; // collect callback results and return them</span>
+
+    // --- create ---
+<span style = "background-color:#dfd">    std::string name, description;
+    auto* create = app.add_subcommand("create", "Create a new project");
+    create-&gt;add_option("--name", name, "Project name")-&gt;required();
+    create-&gt;add_option("--description", description, "Project description");
+    add_file_opt(create);
+    create-&gt;callback([&amp;]{ rc = this-&gt;cmd_create(name, description, file); });</span>
+
+    // --- list ---
+<span style = "background-color:#dfd">    auto* list = app.add_subcommand("list", "List projects");
+    add_file_opt(list);
+    list-&gt;callback([&amp;]{ rc = this-&gt;cmd_list(file); });</span>
+
+    // --- add-task ---
+<span style = "background-color:#dfd">    std::string title, priority = "normal";
+    auto* add_task = app.add_subcommand("add-task", "Add a task");
+    add_task-&gt;add_option("--title", title, "Task title")-&gt;required();
+    auto* opt_priority = add_task-&gt;add_option("--priority", priority, "Priority (low|normal|high)");
+    add_file_opt(add_task);
+    add_task-&gt;callback([&amp;]{
+        const bool priority_was_provided = opt_priority-&gt;count() &gt; 0;
+        rc = this-&gt;cmd_add_task(file, title, priority, priority_was_provided);
+    });</span>
+
+    // --- list-tasks ---
+<span style = "background-color:#dfd">    auto* list_tasks = app.add_subcommand("list-tasks", "List tasks");
+    add_file_opt(list_tasks);
+    list_tasks-&gt;callback([&amp;]{ rc = this-&gt;cmd_list_tasks(file); });</span>
+
+    // --- update-task ---
+<span style = "background-color:#dfd">    int task_id = 0; std::string status;
+    auto* update_task = app.add_subcommand("update-task", "Update task status");
+    update_task-&gt;add_option("--task-id", task_id, "Task id")-&gt;required();
+    update_task-&gt;add_option("--status", status, "Status (completed|open)")-&gt;required();
+    add_file_opt(update_task);
+    update_task-&gt;callback([&amp;]{ rc = this-&gt;cmd_update_task(file, task_id, status); });</span>
+
+    // --- export ---
+<span style = "background-color:#dfd">    std::string out_file;
+    auto* export_cmd = app.add_subcommand("export", "Export project to JSON");
+    export_cmd-&gt;add_option("--out", out_file, "Output JSON file")-&gt;required();
+    add_file_opt(export_cmd);
+    export_cmd-&gt;callback([&amp;]{ rc = this-&gt;cmd_export_json(file, out_file); });</span>
+
+    // --- import ---
+<span style = "background-color:#dfd">    std::string in_file;
+    auto* import_cmd = app.add_subcommand("import", "Import project from JSON");
+    import_cmd-&gt;add_option("--in", in_file, "Input JSON file")-&gt;required();
+    add_file_opt(import_cmd);
+    import_cmd-&gt;callback([&amp;]{ rc = this-&gt;cmd_import_json(file, in_file); });</span>
+
+    try {
+<span style = "background-color:#dfd">        app.parse(argc, argv);
+    } catch (const CLI::ParseError &amp;e) {
+        return app.exit(e); // CLI parse errors set non-zero automatically</span>
+<span style = "background-color:#fdd">    }</span>
+<span style = "background-color:#dfd">    return rc; // propagate our command result
+}</span>
+
+// ================== private commands ==================
+
+int CLIHandler::cmd_create(const std::string&amp; name,
+                           const std::string&amp; description,
+<span style = "background-color:#dfd">                           const std::string&amp; file) {</span>
+    (void)description;
+<span style = "background-color:#dfd">    core::Project p{name};</span>
+    core::FileStorage storage;
+
+<span style = "background-color:#dfd">    std::filesystem::path fp{file};
+    if (!fp.parent_path().empty())
+        std::filesystem::create_directories(fp.parent_path());</span>
+
+<span style = "background-color:#dfd">    storage.save(p, file);
+    spdlog::info("Created project '{}' -&gt; {}", name, file);
+    return 0;
+}</span>
+
+<span style = "background-color:#dfd">int CLIHandler::cmd_list(const std::string&amp; file) {</span>
+    core::FileStorage storage;
+    try {
+<span style = "background-color:#dfd">        auto p = storage.load(file);
+        spdlog::info("Project: {}", p.name());
+    } catch (const std::exception&amp; e) {
+        spdlog::error("Cannot read '{}': {}", file, e.what());
+        return 1;</span>
+<span style = "background-color:#fdd">    }</span>
+<span style = "background-color:#dfd">    return 0;
+}</span>
+
+int CLIHandler::cmd_add_task(const std::string&amp; file,
+                             const std::string&amp; title,
+                             const std::string&amp; priority,
+<span style = "background-color:#dfd">                             bool use_priority_suffix) {</span>
+    core::FileStorage storage;
+    try {
+<span style = "background-color:#dfd">        auto p = storage.load(file);</span>
+
+<span style = "background-color:#dfd">        std::string stored_title = title;
+        if (use_priority_suffix) {
+            stored_title += " [" + priority + "]";</span>
+        }
+
+<span style = "background-color:#dfd">        auto id = p.add_task(stored_title);
+        storage.save(p, file);
+        spdlog::info("Added task {} -&gt; {}", id, file);
+    } catch (const std::exception&amp; e) {
+        spdlog::error("Error adding task: {}", e.what());
+        return 1;</span>
+<span style = "background-color:#fdd">    }</span>
+<span style = "background-color:#dfd">    return 0;
+}</span>
+
+<span style = "background-color:#dfd">int CLIHandler::cmd_list_tasks(const std::string&amp; file) {</span>
+    core::FileStorage storage;
+    try {
+<span style = "background-color:#dfd">        auto p = storage.load(file);
+        for (const auto&amp; t : p.tasks()) {
+            spdlog::info("- [{}] {} {}", (t.done ? 'x' : ' '), t.id, t.title);
+        }
+    } catch (const std::exception&amp; e) {</span>
+<span style = "background-color:#fdd">        spdlog::error("Error listing tasks: {}", e.what());
+        return 1;
+    }</span>
+<span style = "background-color:#dfd">    return 0;
+}</span>
+
+int CLIHandler::cmd_update_task(const std::string&amp; file,
+                                int task_id,
+<span style = "background-color:#dfd">                                const std::string&amp; status) {</span>
+    core::FileStorage storage;
+    try {
+<span style = "background-color:#dfd">        auto p = storage.load(file);
+        if (status == "completed") {
+            if (!p.complete_task(task_id)) {</span>
+<span style = "background-color:#fdd">                spdlog::warn("Task {} not found", task_id);</span>
+<span style = "background-color:#dfd">            }
+        } else if (status == "open") {</span>
+<span style = "background-color:#fdd">            spdlog::warn("Reopening is not implemented. Skipping.");
+        } else {</span>
+<span style = "background-color:#dfd">            spdlog::warn("Unknown status '{}'", status);</span>
+        }
+<span style = "background-color:#dfd">        storage.save(p, file);
+        spdlog::info("Updated tasks -&gt; {}", file);
+    } catch (const std::exception&amp; e) {</span>
+<span style = "background-color:#fdd">        spdlog::error("Error updating task: {}", e.what());
+        return 1;
+    }</span>
+<span style = "background-color:#dfd">    return 0;
+}</span>
+
+int CLIHandler::cmd_export_json(const std::string&amp; file,
+<span style = "background-color:#dfd">                                const std::string&amp; out_file) {
+    std::error_code ec;
+    std::filesystem::create_directories(std::filesystem::path(out_file).parent_path(), ec);
+    std::filesystem::copy_file(file, out_file,</span>
+        std::filesystem::copy_options::overwrite_existing, ec);
+<span style = "background-color:#dfd">    if (ec) {</span>
+<span style = "background-color:#fdd">        spdlog::error("Export failed: {}", ec.message());
+        return 1;</span>
+    }
+<span style = "background-color:#dfd">    spdlog::info("Exported '{}' -&gt; '{}'", file, out_file);
+    return 0;
+}</span>
+
+int CLIHandler::cmd_import_json(const std::string&amp; file,
+<span style = "background-color:#dfd">                                const std::string&amp; in_file) {
+    std::error_code ec;
+    std::filesystem::create_directories(std::filesystem::path(file).parent_path(), ec);
+    std::filesystem::copy_file(in_file, file,</span>
+        std::filesystem::copy_options::overwrite_existing, ec);
+<span style = "background-color:#dfd">    if (ec) {</span>
+<span style = "background-color:#fdd">        spdlog::error("Import failed: {}", ec.message());
+        return 1;</span>
+    }
+<span style = "background-color:#dfd">    spdlog::info("Imported '{}' -&gt; '{}'", in_file, file);
+    return 0;
+}</span>
+
+} // namespace app</pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>

@@ -1,9 +1,9 @@
 [requires]
-nlohmann_json/3.11.3
-spdlog/1.14.1
-cli11/2.4.2
-gtest/1.14.0
-fmt/11.0.2
+nlohmann_json/3.12.0
+spdlog/1.15.3
+cli11/2.5.0
+gtest/1.16.0
+fmt/11.2.0
 
 [generators]
 CMakeDeps
@@ -13,6 +13,6 @@ CMakeToolchain
 cmake/3.29.3
 
 [options]
-spdlog:header_only=False
-spdlog:fmt_external=True
-fmt:header_only=False
+spdlog/*:header_only=False
+spdlog/*:fmt_external=True
+fmt/*:header_only=False
