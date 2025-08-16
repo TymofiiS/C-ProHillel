@@ -1,0 +1,4 @@
+﻿Coverage summary for: core_tests
+  Lines   : 100.0% (53/53)
+  Branches: 0.0% (0/0)
+

@@ -1,0 +1,48 @@
+﻿===== app_tests (Debug) =====
+Running main() from C:\Users\tymof\.conan2\p\b\gtestd305565e8cb4f\b\src\googletest\src\gtest_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from AppCLI
+[ RUN      ] AppCLI.CreateProjectAndList
+[2025-08-16 09:03:40.031] [info] Created project 'My Project' -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_create_93070\projects.json
+[2025-08-16 09:03:40.034] [info] Project: My Project
+[       OK ] AppCLI.CreateProjectAndList (7 ms)
+[ RUN      ] AppCLI.ListMissingFileFails
+[2025-08-16 09:03:40.037] [error] Cannot read 'C:\Users\tymof\AppData\Local\Temp\pm_app_tests_list_missing_93070\nope.json': Failed to open file for reading: C:\Users\tymof\AppData\Local\Temp\pm_app_tests_list_missing_93070\nope.json
+[       OK ] AppCLI.ListMissingFileFails (2 ms)
+[ RUN      ] AppCLI.AddTaskAndListTasks
+[2025-08-16 09:03:40.041] [info] Created project 'Demo' -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_add_task_93070\projects.json
+[2025-08-16 09:03:40.043] [info] Added task 1 -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_add_task_93070\projects.json
+[2025-08-16 09:03:40.044] [info] - [ ] 1 Task 1 [high]
+[       OK ] AppCLI.AddTaskAndListTasks (7 ms)
+[ RUN      ] AppCLI.UpdateTaskCompleted
+[2025-08-16 09:03:40.047] [info] Created project 'U' -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_task_93070\projects.json
+[2025-08-16 09:03:40.049] [info] Added task 1 -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_task_93070\projects.json
+[2025-08-16 09:03:40.050] [info] Updated tasks -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_task_93070\projects.json
+[       OK ] AppCLI.UpdateTaskCompleted (6 ms)
+[ RUN      ] AppCLI.UpdateTaskUnknownStatusWarnsButReturns0
+[2025-08-16 09:03:40.053] [info] Created project 'U' -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_unknown_93070\projects.json
+[2025-08-16 09:03:40.055] [info] Added task 1 -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_unknown_93070\projects.json
+[2025-08-16 09:03:40.056] [warning] Unknown status 'weird'
+[2025-08-16 09:03:40.056] [info] Updated tasks -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_update_unknown_93070\projects.json
+[       OK ] AppCLI.UpdateTaskUnknownStatusWarnsButReturns0 (5 ms)
+[ RUN      ] AppCLI.ExportAndImport
+[2025-08-16 09:03:40.059] [info] Created project 'E' -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\projects.json
+[2025-08-16 09:03:40.061] [info] Added task 1 -> C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\projects.json
+[2025-08-16 09:03:40.067] [info] Exported 'C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\projects.json' -> 'C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\export.json'
+[2025-08-16 09:03:40.069] [info] Imported 'C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\export.json' -> 'C:\Users\tymof\AppData\Local\Temp\pm_app_tests_export_import_93070\projects.json'
+[       OK ] AppCLI.ExportAndImport (13 ms)
+[ RUN      ] AppCLI.MissingRequiredOptionCausesNonZeroExit
+[       OK ] AppCLI.MissingRequiredOptionCausesNonZeroExit (2 ms)
+[ RUN      ] AppCLI.AddTaskOnMissingFileFails
+[2025-08-16 09:03:40.074] [error] Error adding task: Failed to open file for reading: C:\Users\tymof\AppData\Local\Temp\pm_app_tests_add_missing_93070\projects.json
+[       OK ] AppCLI.AddTaskOnMissingFileFails (1 ms)
+[----------] 8 tests from AppCLI (47 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (47 ms total)
+[  PASSED  ] 8 tests.
+--name is required
+Run with --help for more information.
+
+
