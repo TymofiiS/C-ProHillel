@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="1" branch-rate="0" complexity="0" branches-covered="0" branches-valid="0" timestamp="1755327819" lines-covered="53" lines-valid="53" version="0">
+  <sources>
+    <source>D:</source>
+  </sources>
+  <packages>
+    <package name="D:\Repos\C-ProHillel\ProjectManager\build\tests\Debug\core_tests.exe" line-rate="1" branch-rate="0" complexity="0">
+      <classes>
+        <class name="project.h" filename="Repos\C-ProHillel\ProjectManager\src\core\include\core\project.h" line-rate="1" branch-rate="0" complexity="0">
+          <methods/>
+          <lines>
+            <line number="25" hits="1"/>
+          </lines>
+        </class>
+        <class name="project.cpp" filename="Repos\C-ProHillel\ProjectManager\src\core\src\project.cpp" line-rate="1" branch-rate="0" complexity="0">
+          <methods/>
+          <lines>
+            <line number="7" hits="1"/>
+            <line number="9" hits="1"/>
+            <line number="10" hits="1"/>
+            <line number="12" hits="1"/>
+            <line number="13" hits="1"/>
+            <line number="14" hits="1"/>
+            <line number="15" hits="1"/>
+            <line number="16" hits="1"/>
+            <line number="17" hits="1"/>
+            <line number="18" hits="1"/>
+            <line number="20" hits="1"/>
+            <line number="21" hits="1"/>
+            <line number="22" hits="1"/>
+            <line number="23" hits="1"/>
+            <line number="24" hits="1"/>
+            <line number="25" hits="1"/>
+            <line number="26" hits="1"/>
+            <line number="27" hits="1"/>
+            <line number="29" hits="1"/>
+            <line number="30" hits="1"/>
+            <line number="31" hits="1"/>
+            <line number="32" hits="1"/>
+            <line number="33" hits="1"/>
+            <line number="34" hits="1"/>
+            <line number="36" hits="1"/>
+            <line number="37" hits="1"/>
+            <line number="38" hits="1"/>
+            <line number="39" hits="1"/>
+            <line number="40" hits="1"/>
+            <line number="41" hits="1"/>
+            <line number="43" hits="1"/>
+          </lines>
+        </class>
+        <class name="storage.cpp" filename="Repos\C-ProHillel\ProjectManager\src\core\src\storage.cpp" line-rate="1" branch-rate="0" complexity="0">
+          <methods/>
+          <lines>
+            <line number="10" hits="1"/>
+            <line number="11" hits="1"/>
+            <line number="12" hits="1"/>
+            <line number="13" hits="1"/>
+            <line number="14" hits="1"/>
+            <line number="15" hits="1"/>
+            <line number="16" hits="1"/>
+            <line number="17" hits="1"/>
+            <line number="18" hits="1"/>
+            <line number="19" hits="1"/>
+            <line number="20" hits="1"/>
+            <line number="22" hits="1"/>
+            <line number="23" hits="1"/>
+            <line number="24" hits="1"/>
+            <line number="25" hits="1"/>
+            <line number="26" hits="1"/>
+            <line number="27" hits="1"/>
+            <line number="28" hits="1"/>
+            <line number="29" hits="1"/>
+            <line number="30" hits="1"/>
+            <line number="31" hits="1"/>
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

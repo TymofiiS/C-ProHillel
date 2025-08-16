@@ -1,0 +1,39 @@
+﻿===== core_tests (Debug) =====
+Running main() from C:\Users\tymof\.conan2\p\b\gtestd305565e8cb4f\b\src\googletest\src\gtest_main.cc
+[==========] Running 12 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 7 tests from ProjectBasics
+[ RUN      ] ProjectBasics.DefaultNameAndSetName
+[       OK ] ProjectBasics.DefaultNameAndSetName (0 ms)
+[ RUN      ] ProjectBasics.AddTaskAssignsIncrementingIds
+[       OK ] ProjectBasics.AddTaskAssignsIncrementingIds (0 ms)
+[ RUN      ] ProjectBasics.CompleteTaskAndGetTask
+[       OK ] ProjectBasics.CompleteTaskAndGetTask (0 ms)
+[ RUN      ] ProjectBasics.AddTaskRawRespectsAndAdvancesNextId
+[       OK ] ProjectBasics.AddTaskRawRespectsAndAdvancesNextId (0 ms)
+[ RUN      ] ProjectBasics.TasksConstReference
+[       OK ] ProjectBasics.TasksConstReference (0 ms)
+[ RUN      ] ProjectBasics.CompleteNonexistentReturnsFalse
+[       OK ] ProjectBasics.CompleteNonexistentReturnsFalse (0 ms)
+[ RUN      ] ProjectBasics.AddTaskRawNonMonotonic
+[       OK ] ProjectBasics.AddTaskRawNonMonotonic (0 ms)
+[----------] 7 tests from ProjectBasics (0 ms total)
+
+[----------] 5 tests from StorageJSON
+[ RUN      ] StorageJSON.SaveAndLoadRoundTrip
+[       OK ] StorageJSON.SaveAndLoadRoundTrip (2 ms)
+[ RUN      ] StorageJSON.LoadMissingFileThrows
+[       OK ] StorageJSON.LoadMissingFileThrows (0 ms)
+[ RUN      ] StorageJSON.SaveToNonexistentDirectoryThrows
+[       OK ] StorageJSON.SaveToNonexistentDirectoryThrows (0 ms)
+[ RUN      ] StorageJSON.LoadWithMissingFieldsUsesDefaults
+[       OK ] StorageJSON.LoadWithMissingFieldsUsesDefaults (1 ms)
+[ RUN      ] StorageJSON.RoundTripManyTasks
+[       OK ] StorageJSON.RoundTripManyTasks (35 ms)
+[----------] 5 tests from StorageJSON (41 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 2 test suites ran. (42 ms total)
+[  PASSED  ] 12 tests.
+
+

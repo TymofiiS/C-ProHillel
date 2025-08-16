@@ -1,0 +1,4 @@
+﻿Combined coverage summary (Debug)
+
+core_tests: 100.0% lines (53/53), 0.0% branches (0/0)
+app_tests: 86.4% lines (159/184), 0.0% branches (0/0)
