@@ -37,8 +37,8 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent
                 spacing: 12
-                Button { text: "📁 Choose folder"; onClicked: folderDlg.open() }
-                Button { text: "🔎 Scan"; enabled: fileModel.selectedFolder !== ""; onClicked: controller.scan() }
+                Button { text: "📁 Choose folder"; enabled: !controller.scanning; onClicked: folderDlg.open() }
+                Button { text: "🔎 Scan"; enabled: fileModel.selectedFolder !== "" && !controller.scanning; onClicked: controller.scan() }
                 Button { text: "■ Stop"; enabled: controller.scanning; onClicked: controller.stop() }
                 Item { Layout.fillWidth: true }
             }
@@ -57,15 +57,26 @@ ApplicationWindow {
                 RowLayout {
                     Layout.fillWidth: true
                     Label { text: "Progress:"; Layout.fillWidth: true }
-                    Label { text: "0%"; horizontalAlignment: Text.AlignRight }
+                    Label { text: controller.progressPercent + "%"; horizontalAlignment: Text.AlignRight }
                 }
 
-                ProgressBar { Layout.fillWidth: true; from: 0; to: 100; value: 0 }
+                ProgressBar {
+                    Layout.fillWidth: true
+                    from: 0; to: 100
+                    value: controller.progressPercent
+                    indeterminate: controller.scanning && controller.progressPercent === 0
+                }
 
                 RowLayout {
                     Layout.fillWidth: true
-                    Label { text: "Found: 0 files"; Layout.fillWidth: true }
-                    Label { text: "Size: 0 B"; horizontalAlignment: Text.AlignRight }
+                    Label {
+                        text: "Found: " + Number(controller.foundCount).toLocaleString() + " files"
+                        Layout.fillWidth: true
+                    }
+                    Label {
+                        text: "Size: " + humanSize(controller.totalSizeBytes)
+                        horizontalAlignment: Text.AlignRight
+                    }
                 }
             }
         }

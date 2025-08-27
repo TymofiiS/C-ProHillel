@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QMetaObject>
 #include <QThread>
+#include <QUrl>
 
 void FileController::setSelectedFolderFromQml(const QUrl& url)
 {
@@ -35,61 +36,68 @@ void FileController::scan()
     const QString root = m_model->selectedFolder();
     if (root.isEmpty()) return;
 
-    // If a previous scan thread exists, clean it up first
-    if (m_scanThread) {
-        if (m_scanThread->isRunning()) {
-            // optional: you could signal cancellation; here we just wait briefly
-            m_scanThread->quit();
-            m_scanThread->wait();
+    // stop/cleanup previous worker if any
+    if (m_scanThread) {                         // QPointer: true only if object still alive
+        QThread* t = m_scanThread.data();       // raw ptr for clarity
+        if (t->isRunning()) {
+            t->requestInterruption();
+            t->quit();
+            t->wait();
         }
-        m_scanThread->deleteLater();
-        m_scanThread = nullptr;
+        delete t;                               // safe now (not running)
+        m_scanThread.clear();                   // ensure nullptr
     }
 
-    // Mark scanning active before starting
-    m_scanning = true;                  
-    emit scanningChanged();             
+    m_scanning = true;
+    emit scanningChanged();
 
-    // Launch a dedicated worker thread using QThread::create (Qt 6)
     m_scanThread = QThread::create([this, root]() {
-        // Clear model on GUI thread before filling (comment out if you prefer appending)
+        // pre-count for percent
+        const qsizetype totalFiles = countFiles(root);
+
+        // reset progress (& optionally clear the model)
+        resetProgressAsync();
         QMetaObject::invokeMethod(m_model, "clear", Qt::QueuedConnection);
+
+        qsizetype processed = 0;
+        int        found = 0;
+        qulonglong bytes = 0;
 
         QDirIterator it(root, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
+            if (QThread::currentThread()->isInterruptionRequested())
+                break;
 
-            // Check if was send stop request
-            if (QThread::currentThread()->isInterruptionRequested()) { break; }
-                
             it.next();
             const QFileInfo fi = it.fileInfo();
-
             const QString name = fi.fileName();
             const quint64 size = static_cast<quint64>(fi.size());
             const QString type = classifyBySuffix(fi.suffix().toLower());
             const QString date = fi.lastModified().toString("dd.MM.yy");
 
-            // Marshal addFile to the model's (GUI) thread
-            QMetaObject::invokeMethod(
-                m_model,
-                [this, name, size, type, date]() {
-                    m_model->addFile(name, size, type, date);
-                },
-                Qt::QueuedConnection);
+            // add row on GUI thread
+            QMetaObject::invokeMethod(m_model, [this, name, size, type, date]() {
+                m_model->addFile(name, size, type, date);
+                }, Qt::QueuedConnection);
 
-            // Artificial pause to demonstrate non-blocking UI
+            // progress snapshot
+            ++processed; ++found; bytes += size;
+            const int percent = (totalFiles > 0)
+                ? int((100.0 * processed) / totalFiles + 0.5) : 0;
+            updateProgressAsync(percent, found, bytes);
+
+            // artificial pause to demonstrate non-blocking UI
             QThread::msleep(500);
         }
+
+        finalizeProgressAsync();
         });
 
-    // Auto-cleanup when done
-    connect(m_scanThread, &QThread::finished, m_scanThread, &QObject::deleteLater);
-    connect(m_scanThread, &QThread::finished, this, [this]() 
-        {
-            m_scanThread = nullptr; 
-            m_scanning = false;              
-            emit scanningChanged();         
+    connect(m_scanThread, &QThread::finished, this, [this]() {
+        m_scanning = false;
+        emit scanningChanged();
         });
+    connect(m_scanThread, &QThread::finished, m_scanThread, &QObject::deleteLater);
 
     m_scanThread->start();
 }
@@ -99,4 +107,51 @@ void FileController::stop()
     // Tell the worker thread to stop; it will exit when the loop checks this.
     if (m_scanThread && m_scanThread->isRunning())
         m_scanThread->requestInterruption();
+}
+
+void FileController::resetProgressAsync()
+{
+    QMetaObject::invokeMethod(this, [this]() {
+        m_progressPercent = 0;
+        m_foundCount = 0;
+        m_totalSizeBytes = 0;
+        emit progressChanged();
+        }, Qt::QueuedConnection);
+}
+
+void FileController::updateProgressAsync(int percent, int found, qulonglong bytes)
+{
+    QMetaObject::invokeMethod(this, [this, percent, found, bytes]() {
+        m_progressPercent = percent;
+        m_foundCount = found;
+        m_totalSizeBytes = bytes;
+        emit progressChanged();
+        }, Qt::QueuedConnection);
+}
+
+void FileController::finalizeProgressAsync()
+{
+    QMetaObject::invokeMethod(this, [this]() {
+        if (m_progressPercent < 100) {
+            m_progressPercent = 100;
+            emit progressChanged();
+        }
+        }, Qt::QueuedConnection);
+}
+
+qsizetype FileController::countFiles(const QString& root)
+{
+    qsizetype total = 0;
+    for (QDirIterator it(root, QDir::Files, QDirIterator::Subdirectories); it.hasNext();) {
+        if (QThread::currentThread()->isInterruptionRequested())
+            break;
+        it.next();
+        ++total;
+    }
+    return total;
+}
+
+bool FileController::scanning() const
+{
+    return m_scanning;
 }
