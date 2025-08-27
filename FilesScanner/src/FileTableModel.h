@@ -20,6 +20,7 @@ class FileTableModel : public QAbstractTableModel
     Q_PROPERTY(qulonglong  largestFileSize       READ largestFileSize       NOTIFY statsChanged)
     Q_PROPERTY(QString     mostCommonType        READ mostCommonType        NOTIFY statsChanged)
     Q_PROPERTY(int         mostCommonTypePercent READ mostCommonTypePercent NOTIFY statsChanged)
+    Q_PROPERTY(QString     selectedFolder        READ selectedFolder        NOTIFY selectedFolderChanged)
 
 public:
     enum Columns { NameCol = 0, SizeCol, TypeCol, DateCol, ColumnCount };
@@ -33,6 +34,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void addFile(const QString& name, quint64 sizeBytes, const QString& type, const QString& dateDisplay);
+    Q_INVOKABLE void clear();
 
     // Stats getters
     int         totalCount() const { return static_cast<int>(m_rows.size()); }
@@ -42,8 +44,13 @@ public:
     QString     mostCommonType() const { return m_commonType; }
     int         mostCommonTypePercent() const { return m_commonPercent; }
 
+    // Folder selection
+    QString selectedFolder() const { return m_selectedFolder; }
+    void setSelectedFolder(const QString& folder);
+
 signals:
     void statsChanged();
+    void selectedFolderChanged();
 
 private:
     void recomputeStats();
@@ -55,4 +62,5 @@ private:
     qulonglong m_largestSize = 0;
     QString    m_commonType;
     int        m_commonPercent = 0;
+    QString    m_selectedFolder;
 };

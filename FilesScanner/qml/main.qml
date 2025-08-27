@@ -1,12 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs   // FolderDialog
 
 ApplicationWindow {
     visible: true
     width: 760
     height: 560
-    title: "Files Scanner"
+    title: "Files Table"
 
     function humanSize(bytes) {
         if (bytes >= 1024*1024*1024) return (bytes / (1024*1024*1024)).toFixed(1) + " GB"
@@ -15,71 +16,56 @@ ApplicationWindow {
         return bytes + " B"
     }
 
+    // QML-native folder picker
+    FolderDialog {
+        id: folderDlg
+        title: "Select folder"
+        onAccepted: controller.setSelectedFolderFromQml(selectedFolder)
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 12
         spacing: 8
 
-        // Actions block (unchanged style)
+        // Actions
         Frame {
             Layout.fillWidth: true
             padding: 10
-            background: Rectangle {
-                color: "transparent"
-                border.color: "#E5E8EC"
-                radius: 8
-            }
+            background: Rectangle { color: "transparent"; border.color: "#E5E8EC"; radius: 8 }
 
             RowLayout {
                 anchors.fill: parent
                 spacing: 12
-                Button { text: "📁 Choose folder"; onClicked: controller.chooseFolder() }
-                Button { text: "🔎 Scan";          onClicked: controller.scan() }
-                Button { text: "■ Stop";           onClicked: controller.stop() }
-                Button { text: "⬇ Export";         onClicked: controller.exportData() }
+                Button { text: "📁 Choose folder"; onClicked: folderDlg.open() }
+                Button { text: "🔎 Scan"; enabled: fileModel.selectedFolder !== ""; onClicked: controller.scan() }
+                Button { text: "■ Stop"; enabled: controller.scanning; onClicked: controller.stop() }
                 Item { Layout.fillWidth: true }
             }
         }
 
-        // --- Progress block (new) ---
+        // Progress
         Frame {
             Layout.fillWidth: true
             padding: 12
-            background: Rectangle {
-                color: "transparent"
-                border.color: "#E5E8EC"
-                radius: 8
-            }
+            background: Rectangle { color: "transparent"; border.color: "#E5E8EC"; radius: 8 }
 
             ColumnLayout {
                 anchors.fill: parent
                 spacing: 8
 
-                // Top row: "Progress:" left, percentage right
                 RowLayout {
                     Layout.fillWidth: true
                     Label { text: "Progress:"; Layout.fillWidth: true }
-                    Label { text: controller.progressPercent + "%"; horizontalAlignment: Text.AlignRight }
+                    Label { text: "0%"; horizontalAlignment: Text.AlignRight }
                 }
 
-                // Progress bar
-                ProgressBar {
-                    Layout.fillWidth: true
-                    from: 0; to: 100
-                    value: controller.progressPercent
-                }
+                ProgressBar { Layout.fillWidth: true; from: 0; to: 100; value: 0 }
 
-                // Bottom row: found count left, size right
                 RowLayout {
                     Layout.fillWidth: true
-                    Label {
-                        text: "Found: " + Number(controller.foundCount).toLocaleString()
-                        Layout.fillWidth: true
-                    }
-                    Label {
-                        text: "Size: " + humanSize(controller.totalSizeBytes)
-                        horizontalAlignment: Text.AlignRight
-                    }
+                    Label { text: "Found: 0 files"; Layout.fillWidth: true }
+                    Label { text: "Size: 0 B"; horizontalAlignment: Text.AlignRight }
                 }
             }
         }

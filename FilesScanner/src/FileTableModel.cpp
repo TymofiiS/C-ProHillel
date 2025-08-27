@@ -52,6 +52,12 @@ void FileTableModel::addFile(const QString& name, quint64 sizeBytes, const QStri
     recomputeStats();
 }
 
+void FileTableModel::setSelectedFolder(const QString& folder) {
+    if (m_selectedFolder == folder) return;
+    m_selectedFolder = folder;
+    emit selectedFolderChanged();
+}
+
 void FileTableModel::recomputeStats() {
     m_totalSize = 0;
     m_largestSize = 0;
@@ -78,4 +84,12 @@ void FileTableModel::recomputeStats() {
     m_commonPercent = (m_rows.empty() || best == 0) ? 0 : int((100.0 * best) / m_rows.size() + 0.5);
 
     emit statsChanged();
+}
+
+void FileTableModel::clear()
+{
+    beginResetModel();
+    m_rows.clear();
+    endResetModel();
+    recomputeStats();
 }
