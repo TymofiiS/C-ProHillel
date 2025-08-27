@@ -3,6 +3,7 @@
 #include <QThread>
 #include <QUrl>
 #include <QPointer>
+#include <QElapsedTimer>  
 
 class FileTableModel;
 
@@ -13,6 +14,7 @@ class FileController : public QObject
         Q_PROPERTY(int         progressPercent READ progressPercent NOTIFY progressChanged)
         Q_PROPERTY(int         foundCount      READ foundCount      NOTIFY progressChanged)
         Q_PROPERTY(qulonglong  totalSizeBytes  READ totalSizeBytes  NOTIFY progressChanged)
+        Q_PROPERTY(qint64 lastScanDurationMs READ lastScanDurationMs NOTIFY scanDurationChanged)
 
 public:
     explicit FileController(FileTableModel* model, QObject* parent = nullptr)
@@ -29,9 +31,12 @@ public:
     int  foundCount() const { return m_foundCount; }
     qulonglong totalSizeBytes() const { return m_totalSizeBytes; }
 
+    qint64 lastScanDurationMs() const { return m_lastScanDurationMs; }
+
 signals:
     void scanningChanged();
     void progressChanged();
+    void scanDurationChanged();
 
 private:
     // progress helpers 
@@ -48,4 +53,6 @@ private:
     int         m_progressPercent = 0;
     int         m_foundCount = 0;
     qulonglong  m_totalSizeBytes = 0;
+    QElapsedTimer m_scanTimer;        
+    qint64        m_lastScanDurationMs = 0;  
 };

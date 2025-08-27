@@ -51,6 +51,11 @@ void FileController::scan()
     m_scanning = true;
     emit scanningChanged();
 
+    // start timer & reset last duration
+    m_scanTimer.restart();                   
+    m_lastScanDurationMs = 0;                 
+    emit scanDurationChanged();               
+
     m_scanThread = QThread::create([this, root]() {
         // pre-count for percent
         const qsizetype totalFiles = countFiles(root);
@@ -96,7 +101,10 @@ void FileController::scan()
     connect(m_scanThread, &QThread::finished, this, [this]() {
         m_scanning = false;
         emit scanningChanged();
-        });
+
+        m_lastScanDurationMs = m_scanTimer.elapsed();   
+        emit scanDurationChanged();                     
+    });
     connect(m_scanThread, &QThread::finished, m_scanThread, &QObject::deleteLater);
 
     m_scanThread->start();

@@ -7,7 +7,7 @@ ApplicationWindow {
     visible: true
     width: 760
     height: 560
-    title: "Files Table"
+    title: "Files Scanner"
 
     function humanSize(bytes) {
         if (bytes >= 1024*1024*1024) return (bytes / (1024*1024*1024)).toFixed(1) + " GB"
@@ -187,6 +187,36 @@ ApplicationWindow {
 
                 Label { text: "Most common type:"; font.bold: true }
                 Label { text: (fileModel.mostCommonType !== "" ? fileModel.mostCommonType + " (" + fileModel.mostCommonTypePercent + "%)" : "-") }
+            }
+        }
+
+        // Bottom status line (show only when scanning completed)
+        Frame {
+            Layout.fillWidth: true
+            visible: !controller.scanning && controller.progressPercent === 100
+            padding: 0                                 // no inner padding
+
+            background: Rectangle {
+                color: "transparent"
+                border.color: "#E5E8EC"
+                radius: 8
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.margins: 0                     // no margins
+                spacing: 4                             // tiny gap between icon and text
+
+                Text {                                 // no implicit padding like Label
+                    text: "✔"
+                    color: "#2E7D32"
+                }
+                Text {
+                    text: "Status: Scan completed in "
+                          + Math.round(controller.lastScanDurationMs / 1000)
+                          + " sec"
+                    elide: Text.ElideRight
+                }
             }
         }
     }
